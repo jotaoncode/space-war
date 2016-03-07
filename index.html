@@ -1,0 +1,20 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Space War!</title>
+    <meta charset="utf-8">
+    <script src="vendors/system.js"></script>
+</head>
+<body>
+<div style="float:left;">
+  <p id="youloose" style="display:none;">You loose</p>
+  <p id="youwin" style="display:none;">You win score: <strong id="score"></strong></p>
+</div>
+<div id="game"></div>
+<script type="text/javascript">
+  System.import('./vendors/phaser.js').then(function(){
+    System.import('./js/game.js');
+  });
+</script>
+</body>
+</head>
