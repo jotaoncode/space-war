@@ -9,6 +9,7 @@ var Player = function (game) {
 };
 var youloose = false;
 var score = 0;
+var enemyQuantity = 4;
 var SpaceWar = {
   particleTextures: []
 };
@@ -24,7 +25,7 @@ SpaceWar.Preloader.prototype = {
   preload: function () {
     this.load.atlas('stars', 'assets/images/stars.png', 'assets/images/stars.json');
     this.load.image('spaceShip', 'assets/images/space_01.png');
-    this.load.image('enemy', 'assets/images/isaac.png');
+    this.load.image('enemy', 'assets/images/enemy.png');
     this.load.image('bullet', 'assets/images/bullet.png');
     this.load.spritesheet('kaboom', 'assets/images/explosion.png', 64, 64, 23);
   },
@@ -46,7 +47,7 @@ SpaceWar.Game = function () {
 
     this.player = null;
     this.scoreText = null;
-    this.enemies = [];
+    //this.enemies = [];
 
     this.lazers = null;
     this.emitter = null;
@@ -66,7 +67,7 @@ SpaceWar.Game.prototype = {
     this.enemies.setAll('outOfBoundsKill', true);
     this.enemies.setAll('checkWorldBounds', true);
 
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < enemyQuantity; i++) {
       enemy = this.enemies.create(10 + (200 * i), -200 + this.rnd.realInRange(0, 100), 'enemy');
       enemy.body.velocity.y = 40;
       enemy.body.acceleration.y = 10;
@@ -103,8 +104,7 @@ SpaceWar.Game.prototype = {
     var explosionAnimation = this.explosions.getFirstExists(false);
     bullet.kill();
     enemy.kill();
-    score++;
-    explosionAnimation.reset(enemy.x, enemy.y + 100);
+    explosionAnimation.reset(enemy.x + 50, enemy.y + 50);
     explosionAnimation.play('kaboom', 30, false, true);
   },
   shootBullet: function () {
@@ -116,6 +116,12 @@ SpaceWar.Game.prototype = {
         bullet.body.velocity.y = -400;
         bulletTime = game.time.now + 200;
       }
+    }
+  },
+  checkUserWon: function () {
+    if (this.enemies.countDead() === enemyQuantity && !youloose) {
+      document.getElementById('youwin').style.display = 'block';
+      document.getElementById('score').innerHTML = this.enemies.countDead();
     }
   },
   update: function () {
@@ -134,6 +140,7 @@ SpaceWar.Game.prototype = {
     }
     this.physics.arcade.overlap(this.bullets, this.enemies, this.hitToEnemy, null, this);
     this.physics.arcade.overlap(this.spaceShip, this.enemies, this.enemyAndPlayerCollision, null, this);
+    this.checkUserWon();
   },
   enemyAndPlayerCollision: function (player, enemy) {
     var explosionAnimation = this.explosions.getFirstExists(false);
@@ -158,11 +165,3 @@ game.state.add('SpaceWar.Preloader', SpaceWar.Preloader);
 game.state.add('SpaceWar.Game', SpaceWar.Game);
 
 game.state.start('SpaceWar.Preloader');
-
-//Very bad code here to joke I need a win status too
-window.setTimeout(function () {
-  if (!youloose) {
-    document.getElementById('youwin').style.display = 'block';
-    document.getElementById('score').innerHTML = score;
-  }
-}, 10000);
